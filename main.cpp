@@ -10,8 +10,8 @@ int main(void) {
   svr.Get("/", [](const auto &, auto &res) {
     string head = "default"; //TODO: Change head
     string tail = "default"; //TODO: Change tail
-    string author = ""; //TODO: Change your battlesnake username
-    string color = "#888888";  //TODO: Change a hex color
+    string author = "locutus"; //TODO: Change your battlesnake username
+    string color = "#008800";  //TODO: Change a hex color
     res.set_content("{\"apiversion\":\"1\", \"head\":\"" + head + "\", \"tail\":\"" + tail + "\", \"color\":\"" + color + "\", " + "\"author\":\"" + author + "\"}", "application/json");
   });
   svr.Post("/end", [](const auto &, auto &res){
@@ -34,6 +34,6 @@ int main(void) {
     int index = rand() % 4;
     res.set_content("{\"move\": \"" + moves[index] + "\"}", "text/plain");
   });
-  svr.listen("0.0.0.0", 8080);
+  svr.listen("0.0.0.0", 8082);
   cout << "Server started";
 }
