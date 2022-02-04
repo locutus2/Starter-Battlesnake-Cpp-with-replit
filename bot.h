@@ -22,9 +22,19 @@ struct Snake
 class Bot
 {
     Board board;
-    std::string id;
-    std::string name;
     vector<Snake> snakes;
+   
+    // game 
+    int turn;
+    int timeout;
+    string rule_name;
+    string rule_version;
+
+    // you
+    int latency;
+    int health;
+    string id;
+    string name;
     int snake_nr;
 
     public:

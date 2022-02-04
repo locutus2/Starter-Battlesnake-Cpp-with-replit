@@ -8,19 +8,25 @@
 using namespace std;
 using namespace nlohmann;
 
+const char* HOST = "0.0.0.0";
 constexpr int PORT = 8082;
+
+const string HEAD = "sand-worm";
+const string TAIL = "fat-rattle";
+const string COLOR = "#996633";
+const string AUTHOR = "locutus";
 
 Bot bot;
 
-int main(void) {
+int main(int argc, char* argv[]) {
 
   httplib::Server svr;
 
   svr.Get("/", [](const auto &, auto &res) {
-    string head = "default"; //TODO: Change head
-    string tail = "default"; //TODO: Change tail
-    string author = "locutus"; //TODO: Change your battlesnake username
-    string color = "#008800";  //TODO: Change a hex color
+    string head = HEAD;
+    string tail = TAIL;
+    string author = AUTHOR;
+    string color = COLOR;
     res.set_content("{\"apiversion\":\"1\", \"head\":\"" + head + "\", \"tail\":\"" + tail + "\", \"color\":\"" + color + "\", " + "\"author\":\"" + author + "\"}", "application/json");
   });
 
@@ -47,6 +53,12 @@ int main(void) {
     res.set_content("{\"move\": \"" + moves[move] + "\"}", "text/plain");
   });
 
-  svr.listen("0.0.0.0", PORT);
-  cout << "Server started";
+  int port = PORT;
+
+  if(argc >= 2)
+      port = stoi(argv[1]);
+
+  cout << "Server started: " << HOST << ":" << port << endl;
+
+  svr.listen(HOST, port);
 }

@@ -8,9 +8,22 @@ void Bot::setState(const json& data)
 {
     auto& Y = data["you"];
     auto& B = data["board"];
+    auto& G = data["game"];
+
+    auto& S = B["snakes"];
+    auto& R = G["ruleset"];
+
+    turn = data["turn"];
 
     name = Y["name"];
     id = Y["id"];
+    health = Y["health"];
+    //latency = Y["latency"];
+
+    timeout = G["timeout"];
+
+    rule_name = R["name"];
+    rule_version = R["version"];
 
     int height = B["height"];
     int width = B["width"];
@@ -23,7 +36,6 @@ void Bot::setState(const json& data)
     for(auto pos : B["hazards"])
         board.setSquare(pos["y"], pos["x"], { HAZARD });
 
-    auto& S = B["snakes"];
 
     snakes.clear();
     for(int s = 0; s < (int)S.size(); ++s)
