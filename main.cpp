@@ -9,7 +9,7 @@ using namespace std;
 using namespace nlohmann;
 
 const char* HOST = "0.0.0.0";
-constexpr int PORT = 8082;
+constexpr int PORT = 8080;
 
 const string HEAD = "sand-worm";
 const string TAIL = "fat-rattle";
