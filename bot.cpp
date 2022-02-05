@@ -70,7 +70,8 @@ void Bot::end()
 Move Bot::move()
 {
     Move move;
-    vector<Move> moves = board.generateSafeMoves(snakes[snake_nr].head);
+    //vector<Move> moves = board.generateSafeMoves(snakes[snake_nr].head);
+    vector<Move> moves = board.generateGreedySafeMoves(snakes[snake_nr].head);
 
     if(moves.empty())
         move = Move(rand() % 4);

@@ -23,7 +23,8 @@ class Board
     void setDimensions(int height, int width);
     void setSquare(int y, int x, const Square& square);
     Square getSquare(int y, int x) const;
-    vector<Move> generateSafeMoves(const Coord& head) const;
+    vector<Move> generateSafeMoves(const Coord& head, bool onlyFood = false) const;
+    vector<Move> generateGreedySafeMoves(const Coord& head) const;
 };
 
 #endif
