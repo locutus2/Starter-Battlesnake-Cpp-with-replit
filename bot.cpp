@@ -76,12 +76,14 @@ Move Bot::move()
     cout << "----------------------------" << endl;
     cout << "turn: " << turn << endl;
     cout << "latency: " << latency << endl;
+    cout << "health: " << health << endl;
     cout << "length: " << snakes[snake_nr].body.size() << endl;
 
     Move move;
     //vector<Move> moves = board.generateSafeMoves(snakes[snake_nr].head);
     //vector<Move> moves = board.generateGreedySafeMoves(snakes[snake_nr].head);
-    vector<Move> moves = board.generateLongLivingMoves(snakes[snake_nr].head, snakes[snake_nr].health);
+    //vector<Move> moves = board.generateLongLivingMoves(snakes[snake_nr].head, snakes[snake_nr].health);
+    vector<Move> moves = board.generateRealLongLivingMoves(snakes[snake_nr].head, snakes[snake_nr].health, snakes[snake_nr].body.size());
 
     if(moves.empty())
         moves = board.generateSafeMoves(snakes[snake_nr].head);

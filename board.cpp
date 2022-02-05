@@ -86,6 +86,24 @@ Move Board::moveFromTo(const Coord& from, const Coord& to) const
         return NO_MOVE;
 }
 
+Coord Board::moveFrom(const Coord& from, Move move) const
+{
+    switch(move)
+    {
+        case UP:
+            return Coord(from.y+1, from.x);
+        case DOWN:
+            return Coord(from.y-1, from.x);
+        case LEFT:
+            return Coord(from.y, from.x-1);
+        case RIGHT:
+            return Coord(from.y, from.x+1);
+        default:
+	    break;
+    }
+    return from;
+}
+
 // Use bread first search to search for shortest path from head to nearest square of target type
 Move Board::getShortestPathToSquareType(const Coord& head, SQUARE targetType) const
 {
@@ -182,13 +200,93 @@ Move Board::getShortestPathToSquareType(const Coord& head, SQUARE targetType) co
     return move;
 }
 
+int Board::distanceTo(const Coord& pos, SQUARE squareType, bool allow_hazard) const
+{
+    int h = 0;
+    Coord next = pos;
+    while(   board[next.y][next.x].square == FREE
+          || (squareType == SNAKE && board[next.y][next.x].square == FOOD)
+          || (allow_hazard && board[next.y][next.x].square == HAZARD))
+    {
+        if (moveField[next.y][next.x] == NO_MOVE)
+            break;
+	next = moveFrom(next, moveField[next.y][next.x]);
+	++h;
+        if (h > width * height)
+            break;
+    }
+    if(board[next.y][next.x].square != squareType)
+    {
+        h = INF;
+    }
+    return h;
+}
+
+vector<Move> Board::generateRealLongLivingMoves(const Coord& head, int health, int length) const
+{
+    vector<Move> moves;
+    vector<Move> moves2 = generateAllSafeMoves(head, false, false);
+
+    if (!moves2.empty())
+    {
+        if(DEBUG && VERBOSE)
+        {
+             cout << "MoveField+Food:" << endl;
+             for(int y = height-1; y >= 0; --y)
+             {
+                 for(int x = 0; x < width; ++x)
+                 {
+                     if(head.y == y && head.x == x)
+                         cout << "*";
+		     else if(board[y][x].square == FOOD)
+                         cout << "F";
+		     else if(board[y][x].square != FREE)
+                         cout << "#";
+		     else
+                         cout << moveField[y][x];
+                 }
+                 cout << endl;
+             }
+        }
+
+        int best = -1;
+	for(Move move : moves2)
+	{
+           Coord pos = moveFrom(head, move);
+	   int distToFood = (board[pos.y][pos.x].square == FOOD ? 0 : distanceTo(pos, FOOD));
+	   int distToSnake = distanceTo(pos, SNAKE);
+           if (   distToFood < INF && distToFood < health
+               && distToFood > best
+               //&& distToSnake > best
+               && distToSnake < INF && distToSnake + length >= (width-1) * height + (height & 1 ? 2 : width))
+           {
+               moves = { move };
+	       best = distToFood;
+	       //best = distToSnake;
+           }
+
+           if(DEBUG && VERBOSE)
+           {
+             cout << "=> test move=" << move << " distToFood=" << distToFood << " distToSnake=" << distToSnake << endl;
+	   }
+	}
+
+	if(moves.empty())
+	{
+            moves.push_back(moveField[head.y][head.x]);
+	}
+    }
+
+    return moves;
+}
+
 vector<Move> Board::generateLongLivingMoves(const Coord& head, int health) const
 {
     vector<Move> moves;
 
     if (moveField[head.y][head.x] != NO_MOVE)
     {
-        moves = { moveField[head.y][head.x] };
+        moves.push_back(moveField[head.y][head.x]);
     }
 
     return moves;
@@ -220,39 +318,61 @@ vector<Move> Board::generateGreedySafeMoves(const Coord& head) const
     return moves;
 }
 
-vector<Move> Board::generateSafeMoves(const Coord& head, bool onlyFood) const
+vector<Move> Board::generateSafeMoves(const Coord& head, bool onlyFood, bool noFood) const
 {
     vector<Move> moves;
 
     if (head.y > 0 && (   (!onlyFood && getSquare(head.y-1, head.x).square == FREE)
-                       || getSquare(head.y-1, head.x).square == FOOD))
+                       || (!noFood && getSquare(head.y-1, head.x).square == FOOD)))
         moves.push_back(DOWN);
 
     else if (head.y < height-1 && (   (!onlyFood && getSquare(head.y+1, head.x).square == FREE)
-                                   || getSquare(head.y+1, head.x).square == FOOD))
+                                   || (!noFood && getSquare(head.y+1, head.x).square == FOOD)))
         moves.push_back(UP);
 
     else if (head.x <= width / 2) 
     {
     	if (head.x < width-1 && (   (!onlyFood && getSquare(head.y, head.x+1).square == FREE)
-                                 || getSquare(head.y, head.x+1).square == FOOD))
+                                 || (!noFood && getSquare(head.y, head.x+1).square == FOOD)))
              moves.push_back(RIGHT);
 
         else if (head.x > 0 && (   (!onlyFood && getSquare(head.y, head.x-1).square == FREE)
-                                || getSquare(head.y, head.x-1).square == FOOD))
+                                || (!noFood && getSquare(head.y, head.x-1).square == FOOD)))
              moves.push_back(LEFT);
     }
     else
     {
     	if (head.x > 0 && (   (!onlyFood && getSquare(head.y, head.x-1).square == FREE)
-                           || getSquare(head.y, head.x-1).square == FOOD))
+                           || (!noFood && getSquare(head.y, head.x-1).square == FOOD)))
              moves.push_back(LEFT);
 
         else if (head.x < width-1 && (   (!onlyFood && getSquare(head.y, head.x+1).square == FREE)
-                                      || getSquare(head.y, head.x+1).square == FOOD))
+                                      || (!noFood && getSquare(head.y, head.x+1).square == FOOD)))
              moves.push_back(RIGHT);
     }
 
     return moves;
 }
 
+vector<Move> Board::generateAllSafeMoves(const Coord& head, bool onlyFood, bool noFood) const
+{
+    vector<Move> moves;
+
+    if (head.y > 0 && (   (!onlyFood && getSquare(head.y-1, head.x).square == FREE)
+                       || (!noFood && getSquare(head.y-1, head.x).square == FOOD)))
+        moves.push_back(DOWN);
+
+    if (head.y < height-1 && (   (!onlyFood && getSquare(head.y+1, head.x).square == FREE)
+                                   || (!noFood && getSquare(head.y+1, head.x).square == FOOD)))
+        moves.push_back(UP);
+
+    if (head.x < width-1 && (   (!onlyFood && getSquare(head.y, head.x+1).square == FREE)
+                             || (!noFood && getSquare(head.y, head.x+1).square == FOOD)))
+         moves.push_back(RIGHT);
+
+    if (head.x > 0 && (   (!onlyFood && getSquare(head.y, head.x-1).square == FREE)
+                            || (!noFood && getSquare(head.y, head.x-1).square == FOOD)))
+         moves.push_back(LEFT);
+
+    return moves;
+}

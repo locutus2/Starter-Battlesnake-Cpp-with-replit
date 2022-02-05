@@ -4,11 +4,13 @@
 constexpr bool DEBUG = false;
 constexpr bool VERBOSE = false;
 
+constexpr int INF = 1000000;
+
 constexpr int MAX_HEALTH = 100;
 constexpr int MOVE_DAMAGE = 1;
 constexpr int HAZARD_DAMAGE = 15;
 
-constexpr int FOOD_GREEDINESS = 1000000000;
+constexpr int FOOD_GREEDINESS = INF;
 //constexpr int FOOD_GREEDINESS = 0;
 
 enum Move { NO_MOVE = -1, UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3 };

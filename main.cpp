@@ -43,8 +43,8 @@ int main(int argc, char* argv[]) {
 
   svr.Post("/move", [](auto &req, auto &res){
     const json data = json::parse(req.body);
-//    if(DEBUG)
-//        cout << data << endl;
+    if(DEBUG && VERBOSE)
+        cout << data << endl;
 
     bot.setState(data);
     
