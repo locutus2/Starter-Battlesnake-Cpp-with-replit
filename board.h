@@ -25,6 +25,9 @@ class Board
     Square getSquare(int y, int x) const;
     vector<Move> generateSafeMoves(const Coord& head, bool onlyFood = false) const;
     vector<Move> generateGreedySafeMoves(const Coord& head) const;
+    vector<Move> generateLongLivingMoves(const Coord& head, int health) const;
+    Move getShortestPathToSquareType(const Coord& head, SQUARE square) const;
+    Move moveFromTo(const Coord& from, const Coord& to) const;
 };
 
 #endif

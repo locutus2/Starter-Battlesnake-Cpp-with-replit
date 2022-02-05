@@ -1,3 +1,4 @@
+#include "helper.h"
 #include "bot.h"
 
 //----------------------------
@@ -69,9 +70,18 @@ void Bot::end()
 
 Move Bot::move()
 {
+    cout << "----------------------------" << endl;
+    cout << "turn: " << turn << endl;
+    cout << "latency: " << latency << endl;
+    cout << "length: " << snakes[snake_nr].body.size() << endl;
+
     Move move;
     //vector<Move> moves = board.generateSafeMoves(snakes[snake_nr].head);
-    vector<Move> moves = board.generateGreedySafeMoves(snakes[snake_nr].head);
+    //vector<Move> moves = board.generateGreedySafeMoves(snakes[snake_nr].head);
+    vector<Move> moves = board.generateLongLivingMoves(snakes[snake_nr].head, snakes[snake_nr].health);
+
+    if(moves.empty())
+        moves = board.generateSafeMoves(snakes[snake_nr].head);
 
     if(moves.empty())
         move = Move(rand() % 4);

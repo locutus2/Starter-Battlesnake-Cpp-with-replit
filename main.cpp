@@ -3,6 +3,7 @@
 #include <iostream>
 #include "./json.hpp"
 #include "./http_stuff.h"
+#include "./helper.h"
 #include "./bot.h"
 
 using namespace std;
@@ -42,11 +43,11 @@ int main(int argc, char* argv[]) {
 
   svr.Post("/move", [](auto &req, auto &res){
     const json data = json::parse(req.body);
-    cout << data;
-    cout << endl;
+//    if(DEBUG)
+//        cout << data << endl;
 
     bot.setState(data);
-
+    
     string moves[4] = {"up", "down", "left", "right"};
     Move move = bot.move();
     cout << "=> " << moves[move] << endl << endl;
