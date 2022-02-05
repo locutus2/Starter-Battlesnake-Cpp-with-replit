@@ -11,8 +11,53 @@ void Board::setDimensions(int height, int width)
     {
         this->height = height;
         this->width = width;
+
+        if (height > 0 && width > 0)
+        {
+            moveField = vector<vector<Move>>(height, vector<Move>(width, NO_MOVE));
+            initMoveField(moveField);
+        }
     }
-    board = vector<vector<Square>>(height, vector<Square>(width));
+
+    if (height > 0 && width > 0)
+        board = vector<vector<Square>>(height, vector<Square>(width));
+}
+
+void Board::initMoveField(vector<vector<Move>> &moveField)
+{
+   for(int x = 2; x < width; ++x)
+       moveField[0][x] = LEFT;
+
+   for(int y = 0; y < height-1; ++y)
+       moveField[y][0] = UP;
+
+   moveField[height-1][0] = RIGHT;
+
+   for(int y = height-1; y > 0; y -= 2)
+   {
+       for(int x = 1; x < width-1; ++x)
+           moveField[y][x] = RIGHT;
+       moveField[y][width-1] = DOWN;
+
+       for(int x = width-1; x > 1; --x)
+           moveField[y-1][x] = LEFT;
+       moveField[y-1][1] = DOWN;
+   }
+
+   moveField[0][1] = LEFT;
+
+   if(DEBUG && VERBOSE)
+   {
+        cout << "MoveField:" << endl;
+        for(int y = height-1; y >= 0; --y)
+        {
+            for(int x = 0; x < width; ++x)
+            {
+                cout << moveField[y][x];
+            }
+            cout << endl;
+        }
+   }
 }
 
 void Board::setSquare(int y, int x, const Square& square)
@@ -138,6 +183,18 @@ Move Board::getShortestPathToSquareType(const Coord& head, SQUARE targetType) co
 }
 
 vector<Move> Board::generateLongLivingMoves(const Coord& head, int health) const
+{
+    vector<Move> moves;
+
+    if (moveField[head.y][head.x] != NO_MOVE)
+    {
+        moves = { moveField[head.y][head.x] };
+    }
+
+    return moves;
+}
+
+vector<Move> Board::generateLongLivingMoves_old(const Coord& head, int health) const
 {
     vector<Move> moves = generateSafeMoves(head, true);
 

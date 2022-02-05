@@ -62,10 +62,13 @@ void Bot::setState(const json& data)
 
 void Bot::start()
 {
+    cout << "======= Start game ================" << endl;
+    board.setDimensions(-1, -1);
 }
 
 void Bot::end()
 {
+    cout << "======= End game ================" << endl;
 }
 
 Move Bot::move()
