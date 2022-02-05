@@ -28,6 +28,37 @@ vector<Move> Board::generateSafeMoves(const Coord& head) const
                        || getSquare(head.y-1, head.x).square == FOOD))
         moves.push_back(DOWN);
 
+    else if (head.y < height-1 && (   getSquare(head.y+1, head.x).square == FREE
+                              || getSquare(head.y+1, head.x).square == FOOD))
+        moves.push_back(UP);
+
+    else if (head.x <= width / 2) 
+    {
+    	if (head.x < width-1 && (   getSquare(head.y, head.x+1).square == FREE
+                             || getSquare(head.y, head.x+1).square == FOOD))
+             moves.push_back(RIGHT);
+
+	else if (head.x > 0 && (   getSquare(head.y, head.x-1).square == FREE
+                       || getSquare(head.y, head.x-1).square == FOOD))
+             moves.push_back(LEFT);
+    }
+    else
+    {
+	if (head.x > 0 && (   getSquare(head.y, head.x-1).square == FREE
+                       || getSquare(head.y, head.x-1).square == FOOD))
+             moves.push_back(LEFT);
+
+    	else if (head.x < width-1 && (   getSquare(head.y, head.x+1).square == FREE
+                             || getSquare(head.y, head.x+1).square == FOOD))
+             moves.push_back(RIGHT);
+    }
+
+
+    /*
+    if (head.y > 0 && (   getSquare(head.y-1, head.x).square == FREE
+                       || getSquare(head.y-1, head.x).square == FOOD))
+        moves.push_back(DOWN);
+
     if (head.y < height-1 && (   getSquare(head.y+1, head.x).square == FREE
                               || getSquare(head.y+1, head.x).square == FOOD))
         moves.push_back(UP);
@@ -39,6 +70,7 @@ vector<Move> Board::generateSafeMoves(const Coord& head) const
     if (head.x < width-1 && (   getSquare(head.y, head.x+1).square == FREE
                              || getSquare(head.y, head.x+1).square == FOOD))
         moves.push_back(RIGHT);
+*/
 
     return moves;
 }
