@@ -49,10 +49,12 @@ void Bot::setState(const json& data)
         if(id == snake_id)
             snake_nr = s;
 
+	int len = S[s]["length"];
         for(auto pos : S[s]["body"])
         {
-            board.setSquare(pos["y"], pos["x"], {SNAKE, s});
+            board.setSquare(pos["y"], pos["x"], {SNAKE, s, len});
             snakeBody.push_back({pos["y"], pos["x"]});
+	    len--;
         }
 
         snakes.push_back(Snake(snakeHead, snakeBody, health, snake_id));
@@ -84,6 +86,7 @@ Move Bot::move()
     //vector<Move> moves = board.generateGreedySafeMoves(snakes[snake_nr].head);
     //vector<Move> moves = board.generateLongLivingMoves(snakes[snake_nr].head, snakes[snake_nr].health);
     vector<Move> moves = board.generateRealLongLivingMoves(snakes[snake_nr].head, snakes[snake_nr].health, snakes[snake_nr].body.size());
+    //vector<Move> moves = board.generateRealLongLivingMoves2(snakes[snake_nr].head, snakes[snake_nr].health);
 
     if(moves.empty())
         moves = board.generateSafeMoves(snakes[snake_nr].head);

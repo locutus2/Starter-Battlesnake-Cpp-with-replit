@@ -1,8 +1,8 @@
 #ifndef DEFS_H
 #define DEFS_H
 
-constexpr bool DEBUG = false;
-constexpr bool VERBOSE = false;
+constexpr bool DEBUG = true;
+constexpr bool VERBOSE = true;
 
 constexpr int INF = 1000000;
 
