@@ -28,8 +28,8 @@ class Bot
 
     public:
     void setState(const json& data);
-    void start();
-    void end();
+    void start(const json& data);
+    void end(const json& data);
     Move move();
 };
 
