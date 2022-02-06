@@ -85,8 +85,8 @@ Move Bot::move()
     //vector<Move> moves = board.generateSafeMoves(snakes[snake_nr].head);
     //vector<Move> moves = board.generateGreedySafeMoves(snakes[snake_nr].head);
     //vector<Move> moves = board.generateLongLivingMoves(snakes[snake_nr].head, snakes[snake_nr].health);
-    vector<Move> moves = board.generateRealLongLivingMoves(snakes[snake_nr].head, snakes[snake_nr].health, snakes[snake_nr].body.size());
-    //vector<Move> moves = board.generateRealLongLivingMoves2(snakes[snake_nr].head, snakes[snake_nr].health);
+    //vector<Move> moves = board.generateRealLongLivingMoves(snakes[snake_nr].head, snakes[snake_nr].health, snakes[snake_nr].body.size());
+    vector<Move> moves = board.generateRealLongLivingMoves2(snakes[snake_nr]);
 
     if(moves.empty())
         moves = board.generateSafeMoves(snakes[snake_nr].head);

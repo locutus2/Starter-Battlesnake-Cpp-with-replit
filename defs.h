@@ -1,6 +1,10 @@
 #ifndef DEFS_H
 #define DEFS_H
 
+#include <vector>
+
+using namespace std;
+
 constexpr bool DEBUG = true;
 constexpr bool VERBOSE = true;
 
@@ -31,6 +35,24 @@ struct Coord
     {
         return y == c.y && x == c.x;
     }
+};
+
+struct Square
+{
+    SQUARE square = FREE;
+    int snake = 0;
+    int duration = 0;
+};
+
+struct Snake
+{
+    Coord head, tail;
+    vector<Coord> body;
+    int health;
+    string id;
+
+    Snake(const Coord& head, const vector<Coord>& body, int health, const string& id)
+          : head(head), tail(body[body.size()-1]), body(body), health(health), id(id) {}
 };
 
 #endif

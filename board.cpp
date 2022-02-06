@@ -127,7 +127,7 @@ Coord Board::moveFrom(const Coord& from, Move move) const
 }
 
 // Use bread first search to search for shortest path from head to nearest square of target type
-Move Board::getShortestPathToSquareType(const Coord& head, SQUARE targetType) const
+tuple<int, Move, int> Board::getShortestPathToSquareType(const Coord& head, SQUARE targetType) const
 {
     vector<vector<Coord>> visit(height, vector<Coord>(width, Coord(-1,-1)));
     Move move = NO_MOVE;
@@ -137,6 +137,7 @@ Move Board::getShortestPathToSquareType(const Coord& head, SQUARE targetType) co
     q.push(head);
     visit[head.y][head.x] = pos;
     bool cont = true;
+    bool found = false;
     while(cont && !q.empty())
     {
         pos = q.front();
@@ -147,7 +148,6 @@ Move Board::getShortestPathToSquareType(const Coord& head, SQUARE targetType) co
         {
             childs.push_back({ pos.y-1, pos.x });
         }
-
 
         if (pos.y < height-1)
         {
@@ -166,14 +166,18 @@ Move Board::getShortestPathToSquareType(const Coord& head, SQUARE targetType) co
 
         for(const Coord& next : childs)
         {
+            if(visit[next.y][next.x].y >= 0)
+                continue;
+
             if (board[next.y][next.x].square == targetType)
             {
                 visit[next.y][next.x] = pos;
                 pos = next;
                 cont = false;
+		found = true;
                 break;
             }
-            else if (board[next.y][next.x].square != SNAKE && visit[next.y][next.x].y < 0)
+            else if (board[next.y][next.x].square != SNAKE)
             {
                 visit[next.y][next.x] = pos;
                 q.push(next);
@@ -185,17 +189,21 @@ Move Board::getShortestPathToSquareType(const Coord& head, SQUARE targetType) co
 
     Coord lastPos = pos;
     int dist = 0;
-    if(!q.empty())
+    int cost = 0;
+    if(found)
     {
         dist++;
         Coord next = visit[pos.y][pos.x];
 	while(next.y != head.y || next.x != head.x)
 	{
                 ++dist;
+                ++cost;
                 pos = next;
                 next = visit[pos.y][pos.x];
 	}
 	move = moveFromTo(head, pos);
+
+    }
 
         if (DEBUG && VERBOSE)
         {
@@ -209,17 +217,19 @@ Move Board::getShortestPathToSquareType(const Coord& head, SQUARE targetType) co
 		    else if (y == lastPos.y && x == lastPos.x)
                         cout << "!";
 		    else if (board[y][x].square == targetType)
-                        cout << "#";
+                        cout << board[y][x].square;
+		    else if (board[y][x].square == SNAKE)
+                        cout << board[y][x].square;
 		    else
 		        cout << moveFromTo(visit[y][x], {y, x});
 	        }
 	        cout << endl;
 	    }
-	    cout << "result: " << move << endl;
+	    cout << "dist: " << dist << endl;
+	    cout << "move: " << move << endl;
         }
-    }
 
-    return move;
+    return make_tuple(dist, move, cost);
 }
 
 int Board::distanceTo(const Coord& pos, SQUARE squareType, bool allow_hazard) const
@@ -271,9 +281,177 @@ tuple<int, int, int, int> Board::distanceToFoodAndSnake(const Coord& pos) const
     return make_tuple(d, food, board[next.y][next.x].duration, d_food);
 }
 
-vector<Move> Board::generateRealLongLivingMoves2(const Coord& head, int health) const
+bool Board::adjacentTo(const Coord& a, const Coord& b) const
+{
+    return    (a.y == b.y && abs(a.x - b.x) <= 1)
+           || (a.x == b.y && abs(a.y - b.y) <= 1);
+}
+
+struct Node
+{
+	static int AGE;
+        Coord pos;
+        int dist, cost;
+	int health;
+	int age;
+
+	Node(const Coord& pos = Coord(-1,-1), int dist = 0, int cost = 0, int health = 0) : pos(pos), dist(dist), cost(cost), health(health), age(AGE++) {}
+
+        bool operator<(const Node& node) const
+        {
+            return cost > node.cost;// && (cost == node.cost && age > node.age);
+            //return cost > node.cost && (cost == node.cost && age > node.age);
+        }
+
+	static void init()
+	{
+            AGE = 0;
+	}
+};
+
+int Node::AGE = 0;
+
+// Use bread first search to search for shortest path from source to target square under with considering health not to die
+tuple<int, Move, int> Board::getShortestPathTo(const Coord& source, const Coord& target, int health) const
+{
+    Node::init();
+
+    vector<vector<Coord>> visit(height, vector<Coord>(width, Coord(-1,-1)));
+    Move move = NO_MOVE;
+    priority_queue<Node> q;
+    //queue<Node> q;
+    Coord pos(-1, -1);
+
+    q.push(Node(source, 0, 0, health));
+    visit[source.y][source.x] = pos;
+
+    int dist = 0;
+    int cost = 0;
+    int h1 = 0;
+    bool cont = true;
+    bool found = false;
+    while(cont && !q.empty())
+    {
+        Node node = q.top();
+        //Node node = q.front();
+        pos = node.pos;
+
+        vector<Coord> childs;
+
+        if (pos.y > 0)
+        {
+            childs.push_back({ pos.y-1, pos.x });
+        }
+
+        if (pos.y < height-1)
+        {
+            childs.push_back({ pos.y+1, pos.x });
+        }
+
+        if (pos.x > 0)
+        {
+            childs.push_back({ pos.y, pos.x-1 });
+        }
+
+        if (pos.x < width-1)
+        {
+            childs.push_back({ pos.y, pos.x+1 });
+        }
+
+        for(const Coord& next : childs)
+        {
+            if(visit[next.y][next.x].y >= 0)
+                continue;
+
+            if (board[next.y][next.x].square == SNAKE)
+                continue;
+
+	    int d = node.dist + 1;
+	    int c = node.cost + 1;
+	    int h = node.health - 1;
+	    //int d = node.dist - 1;
+	    //int c = node.cost - 1;
+
+            if (board[next.y][next.x].square == FOOD)
+	    {
+                h = MAX_HEALTH;
+		c += 1000;
+	    }
+
+	    if(h <= 0)
+                continue;
+
+            if (adjacentTo(next, target))
+            {
+                visit[next.y][next.x] = pos;
+                pos = next;
+		dist = d;
+		cost = c;
+		h1 = h;
+                cont = false;
+		found = true;
+                break;
+            }
+            else
+            {
+                visit[next.y][next.x] = pos;
+                q.push(Node(next, d, c, h));
+            }
+        }
+
+        q.pop();
+    }
+
+    Coord lastPos = pos;
+    if(found)
+    {
+        Coord next = visit[pos.y][pos.x];
+	while(next.y != source.y || next.x != source.x)
+	{
+            pos = next;
+            next = visit[pos.y][pos.x];
+	}
+	move = moveFromTo(source, pos);
+    }
+
+    if (DEBUG && VERBOSE)
+    {
+        cout << "PATH: source " << source.y << "/" << source.x << " target=" << target.y << "/" << target.x << endl;
+        for(int y = height-1; y >= 0; --y)
+        {
+            for(int x = 0; x < width; ++x)
+            {
+                if (y == source.y && x == source.x)
+                    cout << "*";
+                else if (y == lastPos.y && x == lastPos.x)
+                    cout << "!";
+                //else if (visit[y][x].y >= 0)
+                else if (board[y][x].square == SNAKE)
+                    cout << board[y][x].square;
+                else if (board[y][x].square == FOOD)
+                    cout << board[y][x].square;
+                else
+                    cout << moveFromTo(visit[y][x], {y, x});
+            }
+            cout << endl;
+        }
+        cout << "=>dist: " << dist << endl;
+        cout << "=>cost: " << cost << endl;
+        cout << "=>move: " << move << endl;
+        cout << "=>health: " << h1 << endl;
+    }
+
+    return make_tuple(dist, move, cost);
+}
+
+vector<Move> Board::generateRealLongLivingMoves2(const Snake& snake) const
 {
     vector<Move> moves;
+    auto [dist, move, cost] = getShortestPathTo(snake.head, snake.body.back(), snake.health);
+
+    if (move != NO_MOVE)
+        moves.push_back(move);
+
     return moves;
 }
 
@@ -372,9 +550,9 @@ vector<Move> Board::generateLongLivingMoves_old(const Coord& head, int health) c
 
     if (health <= height + width + FOOD_GREEDINESS)
     {
-        Move move = getShortestPathToSquareType(head, FOOD);
-	if(move != NO_MOVE)
-	    moves = { move };
+        auto [dist, move, cost] = getShortestPathToSquareType(head, FOOD);
+        if(move != NO_MOVE)
+            moves = { move };
     }
 
     return moves;

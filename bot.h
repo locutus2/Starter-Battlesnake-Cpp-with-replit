@@ -8,17 +8,6 @@
 using namespace std;
 using namespace nlohmann;
 
-struct Snake
-{
-    Coord head;
-    vector<Coord> body;
-    int health;
-    string id;
-
-    Snake(const Coord& head, const vector<Coord>& body, int health, const string& id)
-	    : head(head), body(body), health(health), id(id) {}
-};
-
 class Bot
 {
     Board board;
