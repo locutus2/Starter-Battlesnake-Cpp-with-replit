@@ -45,6 +45,7 @@ void Bot::setState(const json& data)
     int width = B["width"];
 
     board.setDimensions(height, width);
+    board.setGameMode(gameMode);
 
     for(auto pos : B["food"])
         board.setSquare(pos["y"], pos["x"], { FOOD });
