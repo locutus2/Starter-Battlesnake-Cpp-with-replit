@@ -27,6 +27,7 @@ class Bot
     int snake_nr;
 
     public:
+    void init(const json& data);
     void setState(const json& data);
     void start(const json& data);
     void end(const json& data);

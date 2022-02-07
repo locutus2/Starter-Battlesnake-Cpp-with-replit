@@ -62,15 +62,30 @@ void Bot::setState(const json& data)
     
 }
 
+void Bot::init(const json& data)
+{
+    board.setDimensions(-1, -1);
+}
+
 void Bot::start(const json& data)
 {
-    cout << "======= Start game ================" << endl;
-    board.setDimensions(-1, -1);
+    string game_id = data["game"]["id"];
+    string bot_id = data["you"]["id"];
+    cout << "======= Start game: game_id=" << game_id << " bot_id=" << bot_id << " ================" << endl;
+
+    init(data);
 }
 
 void Bot::end(const json& data)
 {
-    cout << "======= End game ================" << endl;
+    string game_id = data["game"]["id"];
+    string bot_id = data["you"]["id"];
+    cout << "======= End game: game_id=" << game_id << " bot_id=" << bot_id << " ================" << endl;
+
+    //int health = data["you"]["health"];
+    //int length = data["you"]["length"];
+    //cout << "health: " << health << endl;
+    //cout << "length: " << length << endl;
 }
 
 Move Bot::move()
@@ -87,7 +102,8 @@ Move Bot::move()
     //vector<Move> moves = board.generateLongLivingMoves(snakes[snake_nr].head, snakes[snake_nr].health);
     //vector<Move> moves = board.generateRealLongLivingMoves(snakes[snake_nr].head, snakes[snake_nr].health, snakes[snake_nr].body.size());
     //vector<Move> moves = board.generateRealLongLivingMoves2(snakes[snake_nr]);
-    vector<Move> moves = board.generateRealLongLivingMoves3(snakes[snake_nr]);
+    //vector<Move> moves = board.generateRealLongLivingMoves3(snakes[snake_nr]);
+    vector<Move> moves = board.generateRealLongLivingMoves4(snakes[snake_nr]);
 
     if(moves.empty())
         moves = board.generateSafeMoves(snakes[snake_nr].head);

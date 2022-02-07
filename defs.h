@@ -24,7 +24,7 @@ struct Coord
 {
     int y, x;
 
-    Coord(int y = 0, int x = 0) : y(y), x(x) {}
+    Coord(int y = -1, int x = -1) : y(y), x(x) {}
 
     bool operator<(const Coord& c)  const
     {
@@ -34,6 +34,11 @@ struct Coord
     bool operator==(const Coord& c)  const
     {
         return y == c.y && x == c.x;
+    }
+
+    bool valid() const
+    {
+        return y >= 0 && x >= 0;
     }
 };
 
