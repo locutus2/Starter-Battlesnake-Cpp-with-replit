@@ -18,6 +18,7 @@ class Bot
     int timeout;
     string rule_name;
     string rule_version;
+    GAME_MODE gameMode = STANDARD;
 
     // you
     int latency;

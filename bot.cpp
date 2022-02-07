@@ -26,6 +26,21 @@ void Bot::setState(const json& data)
     rule_name = R["name"];
     rule_version = R["version"];
 
+    if(rule_name == "standard")
+        gameMode = STANDARD;
+    else if(rule_name == "solo")
+        gameMode = SOLO;
+    else if(rule_name == "royale")
+        gameMode = ROYALE;
+    else if(rule_name == "squad")
+        gameMode = SQUAD;
+    else if(rule_name == "constrictor")
+        gameMode = CONSTRICTOR;
+    else if(rule_name == "wrapped")
+        gameMode = WRAPPED;
+    else
+        gameMode = DEFAULT_GAME_MODE;
+
     int height = B["height"];
     int width = B["width"];
 

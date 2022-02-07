@@ -12,12 +12,14 @@ class Board
 {
     int height = 0, width = 0;
     int maxSnakeLength = 0;
+    GAME_MODE gameMode = STANDARD;
 
     vector<vector<Square>> board;
     vector<vector<Move>> moveField;
 
     public:
     void setDimensions(int height, int width);
+    void setGameMode(GAME_MODE gameMode);
     void setSquare(int y, int x, const Square& square);
     Square getSquare(int y, int x) const;
     vector<Move> generateAllSafeMoves(const Coord& head, bool onlyFood = false, bool noFood = false) const;

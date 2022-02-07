@@ -18,7 +18,10 @@ constexpr int FOOD_GREEDINESS = INF;
 //constexpr int FOOD_GREEDINESS = 0;
 
 enum Move { NO_MOVE = -1, UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3 };
-enum SQUARE { FREE = 0, FOOD = 1, HAZARD = 2, SNAKE = 3};
+enum SQUARE { FREE, FOOD, HAZARD, SNAKE };
+enum GAME_MODE { STANDARD, SOLO, ROYALE, SQUAD, CONSTRICTOR, WRAPPED };
+
+constexpr GAME_MODE DEFAULT_GAME_MODE = STANDARD;
 
 struct Coord
 {

@@ -24,6 +24,11 @@ void Board::setDimensions(int height, int width)
         board = vector<vector<Square>>(height, vector<Square>(width));
 }
 
+void Board::setGameMode(GAME_MODE gameMode)
+{
+    this->gameMode = gameMode;
+}
+
 void Board::initMoveField(vector<vector<Move>> &moveField)
 {
    maxSnakeLength = width * height;
@@ -292,24 +297,24 @@ vector<Coord> Board::getNeighbors(const Coord &pos) const
 {
     vector<Coord> neighbors;
 
-    if (pos.y > 0)
+    if (pos.y > 0 || gameMode == WRAPPED)
     {
-        neighbors.push_back({ pos.y-1, pos.x });
+        neighbors.push_back({ (pos.y+height-1) % height, pos.x });
     }
 
-    if (pos.y < height-1)
+    if (pos.y < height-1 || gameMode == WRAPPED)
     {
-        neighbors.push_back({ pos.y+1, pos.x });
+        neighbors.push_back({ (pos.y+1) % height, pos.x });
     }
 
-    if (pos.x > 0)
+    if (pos.x > 0 || gameMode == WRAPPED)
     {
-        neighbors.push_back({ pos.y, pos.x-1 });
+        neighbors.push_back({ pos.y, (pos.x+width-1) % width });
     }
 
-    if (pos.x < width-1)
+    if (pos.x < width-1 || gameMode == WRAPPED)
     {
-        neighbors.push_back({ pos.y, pos.x+1 });
+        neighbors.push_back({ pos.y, (pos.x+1) % width });
     }
 
     return neighbors;
